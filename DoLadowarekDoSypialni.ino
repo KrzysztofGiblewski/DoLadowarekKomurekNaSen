@@ -55,10 +55,24 @@ void loop() {
   minuty = now.minute();
   sekundy = now.second();
 
-  //if (digitalRead(A2) == LOW)   { //przycisk wyboru A2
-
+  if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania
+  {
+    odliczanie++;
+    delay(150);
+  }
+  if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania
+  {
+    odliczanie--;
+    delay(150);
+  }
+  if (digitalRead(A2) == LOW)    //przycisk wyboru A2 bedzie konczyc ladowanie
+  {
+    odliczanie = 0;
+    delay(150);
+  }
 
   lcd.setCursor(0, 0);
+  lcd.print("Teraz ");
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
@@ -70,8 +84,10 @@ void loop() {
   if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(sekundy);
+  lcd.print("   ");
 
-  if (odliczanie >= 1); {
+  if (odliczanie > 0)
+  {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
     lcd.print("  <---:  ");
@@ -79,17 +95,12 @@ void loop() {
       lcd.print(0);
     lcd.print(sekundy);
     if (minutyPoprzednie + 1 == minuty ) //jak minuty od 0 do 9 to trzeba zero dopisac
-    odliczanie--;
-    }
-  if (odliczanie < 1);
+      odliczanie--;
+  }
+  if (odliczanie <= 0)
   {
     lcd.setCursor(0, 1);
     lcd.print("Koniec           ");
-   }
-
-
-
-minutyPoprzednie = minuty;
-
-
+  }
+  minutyPoprzednie = minuty;
 }
