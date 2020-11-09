@@ -57,7 +57,7 @@ void loop() {
 
   //if (digitalRead(A2) == LOW)   { //przycisk wyboru A2
 
-  
+
   lcd.setCursor(0, 0);
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
@@ -71,25 +71,25 @@ void loop() {
     lcd.print(0);
   lcd.print(sekundy);
 
-
-  lcd.setCursor(0, 1);
-  lcd.print(odliczanie);
-  lcd.print("  <---:  ");
-  if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
-    lcd.print(0);
-  lcd.print(sekundy);
-  if (minutyPoprzednie +1== minuty ) //jak minuty od 0 do 9 to trzeba zero dopisac
-  {
+  if (odliczanie >= 1); {
+    lcd.setCursor(0, 1);
+    lcd.print(odliczanie);
+    lcd.print("  <---:  ");
+    if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
+      lcd.print(0);
+    lcd.print(sekundy);
+    if (minutyPoprzednie + 1 == minuty ) //jak minuty od 0 do 9 to trzeba zero dopisac
     odliczanie--;
-  if (odliczanie < 1); {
+    }
+  if (odliczanie < 1);
+  {
     lcd.setCursor(0, 1);
     lcd.print("Koniec           ");
-    odliczanie=0;
-  }
- 
-  }
-  
-  minutyPoprzednie = minuty;
+   }
+
+
+
+minutyPoprzednie = minuty;
 
 
 }
