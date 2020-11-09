@@ -25,8 +25,8 @@ void setup() {
   pinMode(A1, INPUT_PULLUP); // przycisk odejmowania A1
   pinMode(A2, INPUT_PULLUP); //przycisk wyboru A2
   pinMode(A3, OUTPUT); //Konfiguracja A3 jako wyjście dla buzzera
-  //modul na pinie A4 SDA  dla I2C
-  //    i A5 SCL dla I2C
+  pinMode(8, OUTPUT);       //przekaznik1 jako wyjście
+  digitalWrite(8, true);
 
   ////////////*********************************************************************************///////////
   // ******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)
@@ -90,17 +90,19 @@ void loop() {
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
-    lcd.print("  <---:  ");
+    lcd.print("  <---:    ");
     if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
       lcd.print(0);
     lcd.print(sekundy);
     if (minutyPoprzednie + 1 == minuty ) //jak minuty od 0 do 9 to trzeba zero dopisac
       odliczanie--;
+       digitalWrite(8,true);
   }
   if (odliczanie <= 0)
   {
     lcd.setCursor(0, 1);
     lcd.print("Koniec           ");
+    digitalWrite(8, false);
   }
   minutyPoprzednie = minuty;
 }
