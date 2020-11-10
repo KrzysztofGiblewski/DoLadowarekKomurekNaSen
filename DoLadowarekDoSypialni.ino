@@ -9,8 +9,10 @@ int godziny = 12;
 int   minuty = 15;
 int    sekundy = 20;
 
-int odliczanie = 2;
+int odliczanie = 0;
 int minutyPoprzednie;
+
+int interwal = 90;
 
 int ekrany = 0;
 int wyjdzZMenu = 0;
@@ -57,12 +59,13 @@ void loop() {
 
   if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania
   {
-    odliczanie++;
+    odliczanie += interwal;
     delay(150);
   }
   if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania
   {
-    odliczanie--;
+    if (odliczanie > (interwal/4+1))
+    odliczanie -= interwal / 4;
     delay(150);
   }
   if (digitalRead(A2) == LOW)    //przycisk wyboru A2 bedzie konczyc ladowanie
@@ -94,14 +97,16 @@ void loop() {
     if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
       lcd.print(0);
     lcd.print(sekundy);
-    if (minutyPoprzednie + 1 == minuty ) //jak minuty od 0 do 9 to trzeba zero dopisac
+    lcd.print("  ");
+
+    if (minutyPoprzednie != minuty ) // jesli minuty rurzne od poprzednich
       odliczanie--;
-       digitalWrite(8,true);
+    digitalWrite(8, true);
   }
   if (odliczanie <= 0)
   {
     lcd.setCursor(0, 1);
-    lcd.print("Koniec           ");
+    lcd.print("Koniec               ");
     digitalWrite(8, false);
   }
   minutyPoprzednie = minuty;
