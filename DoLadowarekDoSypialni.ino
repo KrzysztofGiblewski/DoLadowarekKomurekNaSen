@@ -15,9 +15,6 @@ int minutyPoprzednie = 0;
 
 int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku
 
-int ekrany = 0;
-int wyjdzZMenu = 0;
-int ekranyUstawien = 0; //czy rozszerzone menu czy krutkie
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
 
 void setup() {
@@ -29,28 +26,17 @@ void setup() {
   pinMode(A2, INPUT_PULLUP); //przycisk wyboru A2
   pinMode(A3, OUTPUT); //Konfiguracja A3 jako wyjście dla buzzera
   pinMode(8, OUTPUT);       //przekaznik1 jako wyjście
-  digitalWrite(8, true);
+  digitalWrite(8, false); // na start wylaczony przekaznik
 
 
 
   ////////////*********************************************************************************///////////
-  // ******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)
-  //*********koniecznie podłączyć 3,3V bo przy 5V wariuje
-  //ROK
-  //  Clock.setYear(18);
-  //MIESIAC
-  //   Clock.setMonth(6);
-  //DZIEN
-  //   Clock.setDate(11);
-  //DZIEN TYGODNIA NP 1 TO PONIEDZIAŁEK
-  //   Clock.setDoW(2);
-  //GODZINA
-  //Clock.setHour(19);
-  //MINUTY
-  //Clock.setMinute(3);
-  //SEKUNDY
-  //   Clock.setSecond(15);
-  //////////////*********************************************************************************////////////
+  /////******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)  ////
+  //         koniecznie podłączyć 3,3V bo przy 5V wariuje ****************************************************************////
+  //   Clock.setHour(19);    //GODZINA                    ****************************************************************////
+  //   Clock.setMinute(3);   //MINUTY                     ****************************************************************////
+  //   Clock.setSecond(15);  //SEKUNDY                    ****************************************************************////
+  ////********************************************************************************************************************////
 
 }
 
@@ -60,26 +46,39 @@ void loop() {
   minuty = now.minute();
   sekundy = now.second();
 
-  if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
+
+sprawdz();
+
+  if (digitalRead(A1) == LOW && digitalRead(A0) == LOW)  // jednoczesnie przytrzymane przyciski A0 i A1 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
   {
-    if (digitalRead(A1) == LOW && digitalRead(A0) == LOW)
-      if (opoznienie < 300)
-        opoznienie += 60;
-      else
-        opoznienie = 0;
+    if (opoznienie < 300)
+    {
+      opoznienie += 60;
+      delay(100);
+    }
+    else if (opoznienie >= 300)
+      opoznienie = 0;
+  }
+  if (digitalRead(A0) == LOW && digitalRead(A1) == HIGH)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
+  {
+    
     odliczanie += interwal;
-    delay(150);
+    delay(200);
+    sprawdz();
   }
   if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
-    if (odliczanie > (interwal / 4 + 1))
-      odliczanie -= interwal / 4;
-    delay(150);
+    if (odliczanie > (interwal / 2 ))
+      odliczanie -= interwal / 2;
+    delay(200);
+    sprawdz();
   }
   if (digitalRead(A2) == LOW)    //przycisk wyboru A2 bedzie konczyc ladowanie
   {
     odliczanie = 0;
-    delay(150);
+    opoznienie = 0;
+    delay(200);
+    sprawdz();
   }
 
   lcd.setCursor(0, 0);
@@ -106,23 +105,24 @@ void loop() {
     lcd.print("  ");
 
     if (minutyPoprzednie != minuty) // jesli minuty rozne od poprzednich nie wazne w ktora strone
-    {
-      if (opoznienie > 0  ) // a opoznienie nadal odlicza
-      {
-        opoznienie--;
-        digitalWrite(8, false);    //przekaznik wylaczony
-      }
-      if (opoznienie < 1 && odliczanie > 0)
-        odliczanie--;
-      digitalWrite(8, true);
-    }
-  }
-  if (odliczanie <= 0)
+   {   minutyPoprzednie = minuty;
+    if (opoznienie>0)
+    opoznienie--;
+    odliczanie--;
+    sprawdz();
+  }}
+  if (odliczanie <= 0 )
   {
     lcd.setCursor(0, 1);
     lcd.print("Koniec            ");
     digitalWrite(8, false);
   }
-  minutyPoprzednie = minuty;
 
+}
+
+void sprawdz() {
+  if (opoznienie > 0  && odliczanie > 0) // a opoznienie nadal odlicza
+    digitalWrite(8, false);
+  if (opoznienie <= 0 && odliczanie > 0)
+    digitalWrite(8, true);
 }
