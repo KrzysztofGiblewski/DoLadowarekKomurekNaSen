@@ -10,7 +10,8 @@ int   minuty = 15;
 int    sekundy = 20;
 
 int odliczanie = 0;
-int minutyPoprzednie=0;
+int opoznienie = 0;
+int minutyPoprzednie = 0;
 
 int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku
 
@@ -30,7 +31,7 @@ void setup() {
   pinMode(8, OUTPUT);       //przekaznik1 jako wyjście
   digitalWrite(8, true);
 
-  
+
 
   ////////////*********************************************************************************///////////
   // ******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)
@@ -61,13 +62,18 @@ void loop() {
 
   if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
+    if (digitalRead(A1) == LOW && digitalRead(A0) == LOW)
+      if (opoznienie < 300)
+        opoznienie += 60;
+      else
+        opoznienie = 0;
     odliczanie += interwal;
     delay(150);
   }
   if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
-    if (odliczanie > (interwal/4+1))
-    odliczanie -= interwal / 4;
+    if (odliczanie > (interwal / 4 + 1))
+      odliczanie -= interwal / 4;
     delay(150);
   }
   if (digitalRead(A2) == LOW)    //przycisk wyboru A2 bedzie konczyc ladowanie
@@ -95,21 +101,30 @@ void loop() {
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
-    lcd.print("  <---:    ");
-    if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
-      lcd.print(0);
-    lcd.print(sekundy);
+    lcd.print(" min   ZA ");
+    lcd.print(opoznienie);
     lcd.print("  ");
 
-    if (minutyPoprzednie != minuty ) // jesli minuty rozne od poprzednich nie wazne w ktora strone 
+    if (minutyPoprzednie != minuty) // jesli minuty rozne od poprzednich nie wazne w ktora strone
+    {
+      //odliczanie--;
+      opoznienie--;
+    }
+    if (opoznienie < 1 ) // jesli minuty sie zmienia i do tego odliczanie 0 lub mniej to 
+    {
       odliczanie--;
-    digitalWrite(8, true);
+      opoznienie == 0;
+      digitalWrite(8, true);    //przekaznik wlaczony 
+
+    }
+    else digitalWrite(8, false);   //a jak opoznienie wieksze to wylaczony
   }
   if (odliczanie <= 0)
   {
     lcd.setCursor(0, 1);
-    lcd.print("Koniec ŁADOWANIA       ");
+    lcd.print("Koniec            ");
     digitalWrite(8, false);
   }
   minutyPoprzednie = minuty;
+
 }
