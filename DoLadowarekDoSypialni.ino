@@ -10,9 +10,9 @@ int   minuty = 15;
 int    sekundy = 20;
 
 int odliczanie = 0;
-int minutyPoprzednie;
+int minutyPoprzednie=0;
 
-int interwal = 90;
+int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku
 
 int ekrany = 0;
 int wyjdzZMenu = 0;
@@ -29,6 +29,8 @@ void setup() {
   pinMode(A3, OUTPUT); //Konfiguracja A3 jako wyjście dla buzzera
   pinMode(8, OUTPUT);       //przekaznik1 jako wyjście
   digitalWrite(8, true);
+
+  
 
   ////////////*********************************************************************************///////////
   // ******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)
@@ -57,12 +59,12 @@ void loop() {
   minuty = now.minute();
   sekundy = now.second();
 
-  if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania
+  if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
     odliczanie += interwal;
     delay(150);
   }
-  if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania
+  if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
     if (odliczanie > (interwal/4+1))
     odliczanie -= interwal / 4;
@@ -99,14 +101,14 @@ void loop() {
     lcd.print(sekundy);
     lcd.print("  ");
 
-    if (minutyPoprzednie != minuty ) // jesli minuty rurzne od poprzednich
+    if (minutyPoprzednie != minuty ) // jesli minuty rozne od poprzednich nie wazne w ktora strone 
       odliczanie--;
     digitalWrite(8, true);
   }
   if (odliczanie <= 0)
   {
     lcd.setCursor(0, 1);
-    lcd.print("Koniec               ");
+    lcd.print("Koniec ŁADOWANIA       ");
     digitalWrite(8, false);
   }
   minutyPoprzednie = minuty;
