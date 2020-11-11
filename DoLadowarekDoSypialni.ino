@@ -47,7 +47,7 @@ void loop() {
   sekundy = now.second();
 
 
-sprawdz();
+  sprawdz();
 
   if (digitalRead(A1) == LOW && digitalRead(A0) == LOW)  // jednoczesnie przytrzymane przyciski A0 i A1 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
   {
@@ -61,7 +61,7 @@ sprawdz();
   }
   if (digitalRead(A0) == LOW && digitalRead(A1) == HIGH)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
-    
+
     odliczanie += interwal;
     delay(200);
     sprawdz();
@@ -105,13 +105,14 @@ sprawdz();
     lcd.print("  ");
 
     if (minutyPoprzednie != minuty) // jesli minuty rozne od poprzednich nie wazne w ktora strone
-   {   minutyPoprzednie = minuty;
-    if (opoznienie>0)
-    opoznienie--;
-    if (opoznienie<=0)
-    odliczanie--;
-    sprawdz();
-  }}
+    { minutyPoprzednie = minuty;
+      if (opoznienie > 0)
+        opoznienie--;
+      if (opoznienie <= 0)
+        odliczanie--;
+      sprawdz();
+    }
+  }
   if (odliczanie <= 0 )
   {
     lcd.setCursor(0, 1);
