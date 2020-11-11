@@ -108,6 +108,7 @@ sprawdz();
    {   minutyPoprzednie = minuty;
     if (opoznienie>0)
     opoznienie--;
+    if (opoznienie<=0)
     odliczanie--;
     sprawdz();
   }}
