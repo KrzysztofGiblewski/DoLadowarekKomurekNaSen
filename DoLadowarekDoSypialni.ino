@@ -107,17 +107,15 @@ void loop() {
 
     if (minutyPoprzednie != minuty) // jesli minuty rozne od poprzednich nie wazne w ktora strone
     {
-      //odliczanie--;
-      opoznienie--;
+      if (opoznienie > 0  ) // a opoznienie nadal odlicza
+      {
+        opoznienie--;
+        digitalWrite(8, false);    //przekaznik wylaczony
+      }
+      if (opoznienie < 1 && odliczanie > 0)
+        odliczanie--;
+      digitalWrite(8, true);
     }
-    if (opoznienie < 1 ) // jesli minuty sie zmienia i do tego odliczanie 0 lub mniej to 
-    {
-      odliczanie--;
-      opoznienie == 0;
-      digitalWrite(8, true);    //przekaznik wlaczony 
-
-    }
-    else digitalWrite(8, false);   //a jak opoznienie wieksze to wylaczony
   }
   if (odliczanie <= 0)
   {
