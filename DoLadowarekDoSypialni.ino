@@ -30,8 +30,8 @@ void setup() {
 
 
 
-  ////////////*********************************************************************************///////////
-  /////******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)  ////
+  ////////////*****************************************************************************************************///////////
+  // żeby ustawić po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)  ////
   //         koniecznie podłączyć 3,3V bo przy 5V wariuje ****************************************************************////
   //   Clock.setHour(19);    //GODZINA                    ****************************************************************////
   //   Clock.setMinute(3);   //MINUTY                     ****************************************************************////
