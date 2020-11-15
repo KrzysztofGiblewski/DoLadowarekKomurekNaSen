@@ -24,7 +24,7 @@ void setup() {
   lcd.print("0");
   pinMode(A0, INPUT_PULLUP); // Przycisk dodawania sztuki A0
   pinMode(A1, INPUT_PULLUP); // Przycisk odejmowania A1
-  pinMode(A2, INPUT_PULLUP); // Przycisk wyboru A2
+  pinMode(A2, INPUT_PULLUP); // Przycisk dodawania opuznienia
   pinMode(A3, OUTPUT);       // Konfiguracja A3 jako wyjście dla buzzera
   pinMode(8, OUTPUT);        // Przekaznik jako wyjście
   digitalWrite(8, false);    // Na start wylaczony przekaznik
@@ -49,57 +49,61 @@ void loop() {
 
 
   sprawdz();
+  wyswietl();
 
-  if (digitalRead(A1) == LOW && digitalRead(A0) == LOW)  // jednoczesnie przytrzymane przyciski A0 i A1 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
+  if (digitalRead(A2) == LOW  )  // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
   {
-    if (opoznienie < 300)
+    if (opoznienie < 301)
     {
       opoznienie += 60;
-      delay(100);
+      delay(250);
     }
-    else if (opoznienie >= 300)
+    else if (opoznienie > 301)
       opoznienie = 0;
+    delay(250);
   }
-  if (digitalRead(A1) == HIGH && digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
+  if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
-    if (odliczanie < 300)
+    if (odliczanie > 301)
       odliczanie = 0;
     odliczanie += interwal;
-    delay(200);
-    sprawdz();
-
+    delay(250);
   }
-  if (digitalRead(A1) == LOW && digitalRead(A0) == HIGH)  //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
+  if (digitalRead(A1) == LOW)  //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
-    if (odliczanie > (interwal / 2 ))
-      odliczanie -= interwal / 2;
-    delay(200);
-    sprawdz();
+    if (odliczanie < (interwal / 2 ))
+      odliczanie = 0;
+    odliczanie -= interwal / 2;
+    delay(250);
   }
-  if (digitalRead(A2) == LOW && digitalRead(A0) == HIGH)    //przycisk wyboru A2 bedzie konczyc ladowanie
+  if (digitalRead(A2) == LOW && digitalRead(A0) == LOW)    //przycisk wyboru A2 razem z A0  bedzie konczyc ladowanie
   {
     odliczanie = 0;
     opoznienie = 0;
-    delay(200);
-    sprawdz();
+    delay(250);
   }
+
+
+}
+
+void wyswietl() {
 
   lcd.setCursor(0, 0);
   lcd.print("Teraz: ");
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
-  lcd.print(" : ");
+  lcd.print(":");
   if (minuty < 10) //jak minuty od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(minuty);
-  lcd.print(" : ");
+  lcd.print(":");
   if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(sekundy);
   lcd.print("   ");
 
-  if (odliczanie > 0)
+  if ((odliczanie > 0 )|| (opoznienie > 0))
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
@@ -123,7 +127,6 @@ void loop() {
     lcd.print("Brak napiecia        ");
     digitalWrite(8, false);
   }
-
 }
 
 void sprawdz() {
