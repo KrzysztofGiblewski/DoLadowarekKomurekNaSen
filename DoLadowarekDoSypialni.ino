@@ -6,12 +6,15 @@ DS3231 Clock;
 RTClib RTC;
 
 int godziny = 12;
-int   minuty = 15;
-int    sekundy = 20;
+int  minuty = 15;
+int sekundy = 20;
 
 int odliczanie = 0;
 int opoznienie = 0;
+
 int minutyPoprzednie = 0;
+
+int ekrany = 0;
 
 int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku
 
@@ -59,21 +62,23 @@ void loop() {
     else if (opoznienie >= 300)
       opoznienie = 0;
   }
-  if (digitalRead(A0) == LOW && digitalRead(A1) == HIGH)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
+  if (digitalRead(A1) == HIGH && digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
-
+    if(odliczanie<300)
+    odlicz=0;
     odliczanie += interwal;
     delay(200);
     sprawdz();
+    
   }
-  if (digitalRead(A1) == LOW)    //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
+  if (digitalRead(A1) == LOW && digitalRead(A0) == HIGH)  //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
     if (odliczanie > (interwal / 2 ))
       odliczanie -= interwal / 2;
     delay(200);
     sprawdz();
   }
-  if (digitalRead(A2) == LOW)    //przycisk wyboru A2 bedzie konczyc ladowanie
+  if (digitalRead(A2) == LOW && digitalRead(A0) == HIGH)    //przycisk wyboru A2 bedzie konczyc ladowanie
   {
     odliczanie = 0;
     opoznienie = 0;
@@ -81,16 +86,16 @@ void loop() {
     sprawdz();
   }
 
-  lcd.setCursor(0, 0);
-  lcd.print("Teraz ");
+    lcd.setCursor(0, 0);
+    lcd.print("Teraz: ");
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
-  lcd.print(godziny);
-  lcd.print(":");
+    lcd.print(godziny);
+    lcd.print(" : ");
   if (minuty < 10) //jak minuty od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(minuty);
-  lcd.print(":");
+  lcd.print(" : ");
   if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(sekundy);
@@ -105,7 +110,8 @@ void loop() {
     lcd.print("  ");
 
     if (minutyPoprzednie != minuty) // jesli minuty rozne od poprzednich nie wazne w ktora strone
-    { minutyPoprzednie = minuty;
+    {
+      minutyPoprzednie = minuty;
       if (opoznienie > 0)
         opoznienie--;
       if (opoznienie <= 0)
@@ -116,7 +122,7 @@ void loop() {
   if (odliczanie <= 0 )
   {
     lcd.setCursor(0, 1);
-    lcd.print("Koniec            ");
+    lcd.print("Brak napiecia        ");
     digitalWrite(8, false);
   }
 
