@@ -56,6 +56,7 @@ void loop() {
     if (opoznienie < 301)
     {
       opoznienie += 60;
+      round(opoznienie);
       delay(250);
     }
     else if (opoznienie > 301)
@@ -67,13 +68,13 @@ void loop() {
     if (odliczanie > 301)
       odliczanie = 0;
     odliczanie += interwal;
-    delay(250);
+        delay(250);
   }
   if (digitalRead(A1) == LOW)  //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
     if (odliczanie < (interwal / 2 ))
       odliczanie = 0;
-    odliczanie -= interwal / 2;
+    odliczanie -= interwal / 2;    
     delay(250);
   }
   if (digitalRead(A2) == LOW && digitalRead(A0) == LOW)    //przycisk wyboru A2 razem z A0  bedzie konczyc ladowanie
@@ -103,7 +104,7 @@ void wyswietl() {
   lcd.print(sekundy);
   lcd.print("   ");
 
-  if ((odliczanie > 0 )|| (opoznienie > 0))
+  if (odliczanie > 0 )
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
