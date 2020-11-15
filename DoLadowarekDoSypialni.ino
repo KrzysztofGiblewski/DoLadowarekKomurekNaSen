@@ -9,14 +9,12 @@ int godziny = 12;
 int  minuty = 15;
 int sekundy = 20;
 
-int odliczanie = 0;
-int opoznienie = 0;
+int odliczanie = 0;  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
+int opoznienie = 0;   // ilosc minut pozostala do rozpoczecia ladowania
 
-int minutyPoprzednie = 0;
+int minutyPoprzednie = 0; //taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie 
 
-int ekrany = 0;
-
-int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku
+int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci 
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
 
@@ -24,16 +22,16 @@ void setup() {
   lcd.begin(16, 2);
   Serial.begin(9600);
   lcd.print("0");
-  pinMode(A0, INPUT_PULLUP); //przycisk dodawania sztuki A0
-  pinMode(A1, INPUT_PULLUP); // przycisk odejmowania A1
-  pinMode(A2, INPUT_PULLUP); //przycisk wyboru A2
-  pinMode(A3, OUTPUT); //Konfiguracja A3 jako wyjście dla buzzera
-  pinMode(8, OUTPUT);       //przekaznik1 jako wyjście
-  digitalWrite(8, false); // na start wylaczony przekaznik
+  pinMode(A0, INPUT_PULLUP); // Przycisk dodawania sztuki A0 
+  pinMode(A1, INPUT_PULLUP); // Przycisk odejmowania A1
+  pinMode(A2, INPUT_PULLUP); // Przycisk wyboru A2
+  pinMode(A3, OUTPUT);       // Konfiguracja A3 jako wyjście dla buzzera
+  pinMode(8, OUTPUT);        // Przekaznik jako wyjście
+  digitalWrite(8, false);    // Na start wylaczony przekaznik
 
 
 
-  ////////////*********************************************************************************///////////
+  ////////////*****************************************************************************************************///////////
   /////******* to po kolei wybraną linie odkomentować żeby ustawić zegar a potem zakomentować,  prymitywne ale dziala ;)  ////
   //         koniecznie podłączyć 3,3V bo przy 5V wariuje ****************************************************************////
   //   Clock.setHour(19);    //GODZINA                    ****************************************************************////
