@@ -12,9 +12,9 @@ int sekundy = 20;
 int odliczanie = 0;  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
 int opoznienie = 0;   // ilosc minut pozostala do rozpoczecia ladowania
 
-int minutyPoprzednie = 0; //taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie 
+int minutyPoprzednie = 0; //taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
 
-int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci 
+int interwal = 90;   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
 
@@ -22,7 +22,7 @@ void setup() {
   lcd.begin(16, 2);
   Serial.begin(9600);
   lcd.print("0");
-  pinMode(A0, INPUT_PULLUP); // Przycisk dodawania sztuki A0 
+  pinMode(A0, INPUT_PULLUP); // Przycisk dodawania sztuki A0
   pinMode(A1, INPUT_PULLUP); // Przycisk odejmowania A1
   pinMode(A2, INPUT_PULLUP); // Przycisk wyboru A2
   pinMode(A3, OUTPUT);       // Konfiguracja A3 jako wyjście dla buzzera
@@ -62,12 +62,12 @@ void loop() {
   }
   if (digitalRead(A1) == HIGH && digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
-    if(odliczanie<300)
-    odlicz=0;
+    if (odliczanie < 300)
+      odlicz = 0;
     odliczanie += interwal;
     delay(200);
     sprawdz();
-    
+
   }
   if (digitalRead(A1) == LOW && digitalRead(A0) == HIGH)  //przycisk wyboru A1 bedzie odejmowal dlugosc ladowania pod warunkiem ze nie pozostalo mniej niz chce odjac
   {
@@ -84,12 +84,12 @@ void loop() {
     sprawdz();
   }
 
-    lcd.setCursor(0, 0);
-    lcd.print("Teraz: ");
+  lcd.setCursor(0, 0);
+  lcd.print("Teraz: ");
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
-    lcd.print(godziny);
-    lcd.print(" : ");
+  lcd.print(godziny);
+  lcd.print(" : ");
   if (minuty < 10) //jak minuty od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(minuty);
