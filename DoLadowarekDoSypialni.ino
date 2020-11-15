@@ -63,7 +63,7 @@ void loop() {
   if (digitalRead(A1) == HIGH && digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
     if (odliczanie < 300)
-      odlicz = 0;
+      odliczanie = 0;
     odliczanie += interwal;
     delay(200);
     sprawdz();
