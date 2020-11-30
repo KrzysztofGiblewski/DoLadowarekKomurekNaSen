@@ -68,7 +68,7 @@ void loop() {
   {
     if (wylaczWentylator == false)
       piecMinut += dlugoscWlaczWent;
-      if(piecMinut>minuty+(dlugoscWlaczWent*3)
+      if(piecMinut>minuty+(dlugoscWlaczWent*3))
       piecMinut=minuty;
     if (wylaczWentylator == true)
     {
@@ -95,8 +95,12 @@ void loop() {
 void wyswietl() {
 
   lcd.setCursor(0, 0);
+  if(wylaczWentylator==false)
+  {
+    lcd.print("DO ");
   lcd.print(piecMinut);
-  lcd.print(" FAN ");
+  lcd.print(" ");
+    }
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
@@ -108,9 +112,9 @@ void wyswietl() {
   if (sekundy < 10) //jak sekundy od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(sekundy);
-  lcd.print("   ");
+  lcd.print("          ");
 
-  if (odliczanie > 0 || opoznienie > 0)
+  if (odliczanie != 0 || opoznienie != 0)
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
@@ -128,11 +132,12 @@ void wyswietl() {
       sprawdz();
     }
   }
-  if (odliczanie <= 0 )
+  if (odliczanie <= 0 &&opoznienie<=0)
   {
     lcd.setCursor(0, 1);
     lcd.print("Brak napiecia        ");
-    digitalWrite(8, false);
+    digitalWrite(8, false); //wylacza napiecie
+    
   }
 }
 
