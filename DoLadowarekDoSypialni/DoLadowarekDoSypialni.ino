@@ -12,7 +12,7 @@ int sekundy = 20;
 int odliczanie = 0;  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
 int opoznienie = 0;   // ilosc minut pozostala do rozpoczecia ladowania
 int piecMinut = 0;
-int dlugoscWlaczWent = 5; // dlugos dzialania wentylatora w minutach
+int dlugoscWlaczWent = 3; // dlugos dzialania wentylatora w minutach
 int minutyPoprzednie = 0; //taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
 
 
@@ -66,18 +66,18 @@ void loop() {
   }
   if (digitalRead(A1) == LOW)  //przycisk uruchamia wentylator na dlugoscWlaczWent minut
   {
-    if (wylaczWentylator == false)
-      piecMinut += dlugoscWlaczWent;
-      if(piecMinut>minuty+(dlugoscWlaczWent*3))
-      piecMinut=minuty;
-    if (wylaczWentylator == true)
+    if (wylaczWentylator == false) //jak wentylator juz wlaczony
+      piecMinut += dlugoscWlaczWent; //to dodaj do minut wylaczenia czas
+    if (piecMinut > (dlugoscWlaczWent*3) + minuty )// a jak 3 krotnosc dlugosci dzialania
+      piecMinut = minuty;  // to wyzerowanie przez nastawienie minut wylaczenia na biezace minuty
+    if (wylaczWentylator == true)  // jak kontrolka wylaczenia na true
     {
-      piecMinut = minuty + dlugoscWlaczWent;
-      wylaczWentylator = false; //kontrolka wylaczenia ladowania 
-       }
+      piecMinut = minuty + dlugoscWlaczWent; // ustawienie startowej minuty
+      wylaczWentylator = false; //kontrolka wylaczenia ladowania
+    }
     if (piecMinut > 59)
       piecMinut = piecMinut - 60;
-       delay(250);
+    delay(250);
   }
 
   if (digitalRead(A2) == LOW  )  // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
@@ -95,12 +95,12 @@ void loop() {
 void wyswietl() {
 
   lcd.setCursor(0, 0);
-  if(wylaczWentylator==false)
+  if (wylaczWentylator == false)
   {
     lcd.print("DO ");
-  lcd.print(piecMinut);
-  lcd.print(" ");
-    }
+    lcd.print(piecMinut);
+    lcd.print(" ");
+  }
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
@@ -132,12 +132,12 @@ void wyswietl() {
       sprawdz();
     }
   }
-  if (odliczanie <= 0 &&opoznienie<=0)
+  if (odliczanie <= 0 && opoznienie <= 0)
   {
     lcd.setCursor(0, 1);
     lcd.print("Brak napiecia        ");
     digitalWrite(8, false); //wylacza napiecie
-    
+
   }
 }
 
@@ -148,16 +148,16 @@ void sprawdz() {
     digitalWrite(8, true); // to przekaznik podaje
 
   if (wylaczWentylator == false) // jesli kontrolka wylaczenia wentylatora wylaczona
-    {
-      digitalWrite(7, false);  //przekaznik wentylatora wlaczony
-    
+  {
+    digitalWrite(7, false);  //przekaznik wentylatora wlaczony
+
     if (piecMinut == minuty) //jak piecMinut czyli minuty rowne  nastawione minuty to koniec
     {
       digitalWrite(7, true);
       wylaczWentylator = true;
     }
-    }
-     
+  }
+
   if (godziny == 10 && minuty == 10) // tak na sztywno zapisany czas wlaczenia wentylatora zeby sie przewietrzylo
   {
     wylaczWentylator = false;
