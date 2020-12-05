@@ -9,15 +9,17 @@ int godziny = 12;
 int  minuty = 15;
 int sekundy = 20;
 
-int odliczanie = 0;  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
-int opoznienie = 0;   // ilosc minut pozostala do rozpoczecia ladowania
-int piecMinut = 0;
-int dlugoscWlaczWent = 3; // dlugos dzialania wentylatora w minutach
+int odliczanie = 0;      // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
+int opoznienie = 0;      // ilosc minut pozostala do rozpoczecia ladowania
+int minutyOKtorychWylaczySieWentylator = 0;
+int limitCzasuWlaczeniaWent = 20;
+int sumaCzasuWlaczeniaWentylatora = 0;
+int interwaCzasulWlaczeniaWentylatora = 3; // interwal dodawania czasu dzialania wentylatora w minutach
 int minutyPoprzednie = 0; //taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
+int godzinaWentylator;
 
-
-int interwal = 30;   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
-boolean wylaczWentylator = true;
+int interwal = 25;   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
+boolean kontrolkaWlaczonegoWentylatora = false;
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
 
@@ -64,20 +66,21 @@ void loop() {
       odliczanie = 0;
     delay(250);
   }
-  if (digitalRead(A1) == LOW)  //przycisk uruchamia wentylator na dlugoscWlaczWent minut
+  if (digitalRead(A1) == LOW)  //przycisk uruchamia wentylator na interwaCzasulWlaczeniaWentylatora minut
   {
-    if (wylaczWentylator == false) //jak wentylator juz wlaczony
-      piecMinut += dlugoscWlaczWent; //to dodaj do minut wylaczenia czas
-    if (piecMinut > (dlugoscWlaczWent*3) + minuty )// a jak 3 krotnosc dlugosci dzialania
-      piecMinut = minuty;  // to wyzerowanie przez nastawienie minut wylaczenia na biezace minuty
-    if (wylaczWentylator == true)  // jak kontrolka wylaczenia na true
+    sumaCzasuWlaczeniaWentylatora += interwaCzasulWlaczeniaWentylatora; //to dodaj do minut wylaczenia czas
+    kontrolkaWlaczonegoWentylatora = true;
+    godzinaWentylator = godziny;
+    if (limitCzasuWlaczeniaWent < sumaCzasuWlaczeniaWentylatora  )// a jak przekroczy limit czasu dlugosci dzialania
     {
-      piecMinut = minuty + dlugoscWlaczWent; // ustawienie startowej minuty
-      wylaczWentylator = false; //kontrolka wylaczenia ladowania
+      sumaCzasuWlaczeniaWentylatora = 0;  // to wyzerowanie przez nastawienie minut wylaczenia na biezace minuty
     }
-    if (piecMinut > 59)
-      piecMinut = piecMinut - 60;
-    delay(250);
+    minutyOKtorychWylaczySieWentylator = minuty + sumaCzasuWlaczeniaWentylatora; // ustawienie koncowej minuty
+    if (minutyOKtorychWylaczySieWentylator > 59)
+      minutyOKtorychWylaczySieWentylator = minutyOKtorychWylaczySieWentylator - 60;
+    godzinaWentylator = godziny + 1;
+
+    delay(250);   // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
   }
 
   if (digitalRead(A2) == LOW  )  // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
@@ -95,10 +98,12 @@ void loop() {
 void wyswietl() {
 
   lcd.setCursor(0, 0);
-  if (wylaczWentylator == false)
+  if (kontrolkaWlaczonegoWentylatora == true)
   {
     lcd.print("DO ");
-    lcd.print(piecMinut);
+    lcd.print(godzinaWentylator);
+    lcd.print(":");
+    lcd.print(minutyOKtorychWylaczySieWentylator);
     lcd.print(" ");
   }
   if (godziny < 10) //jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
@@ -142,33 +147,36 @@ void wyswietl() {
 }
 
 void sprawdz() {
-  if (opoznienie > 0  && odliczanie > 0) // a opoznienie nadal odlicza
-    digitalWrite(8, false);
-  if (opoznienie <= 0 && odliczanie > 0) //jak opuznienie doszlo do zera i czas ladowania jest nadal wiekszy od zera
-    digitalWrite(8, true); // to przekaznik podaje
+  if (opoznienie > 0  && odliczanie > 0)       // a opoznienie nadal odlicza
+    digitalWrite(8, false);                   //  przekaznik nie podaje napiecia
+  if (opoznienie <= 0 && odliczanie > 0)     //   jak opuznienie doszlo do zera i czas ladowania jest nadal wiekszy od zera
+    digitalWrite(8, true);                  //    to przekaznik podaje napiecie
 
-  if (wylaczWentylator == false) // jesli kontrolka wylaczenia wentylatora wylaczona
+  if (sumaCzasuWlaczeniaWentylatora > 0 && kontrolkaWlaczonegoWentylatora == true)  // jesli kontrolka wylaczenia wentylatora wylaczona
   {
-    digitalWrite(7, false);  //przekaznik wentylatora wlaczony
+    digitalWrite(7, false);                                                         // przekaznik wentylatora wlaczony
 
-    if (piecMinut == minuty) //jak piecMinut czyli minuty rowne  nastawione minuty to koniec
-    {
-      digitalWrite(7, true);
-      wylaczWentylator = true;
-    }
+  }
+  if (minutyOKtorychWylaczySieWentylator == minuty && kontrolkaWlaczonegoWentylatora == true)   //jak minutyOKtorychWylaczySieWentylator czyli minuty rowne  nastawione minuty to koniec
+  {
+    digitalWrite(7, true);                                                                      // przekaznik wylaczony wentylator nie dziala
+    kontrolkaWlaczonegoWentylatora = false;
   }
 
-  if (godziny == 10 && minuty == 10) // tak na sztywno zapisany czas wlaczenia wentylatora zeby sie przewietrzylo
+
+  if (godziny == 10 && minuty == 10)        // tak na sztywno zapisany czas wlaczenia wentylatora zeby sie przewietrzylo
   {
-    wylaczWentylator = false;
+    sumaCzasuWlaczeniaWentylatora = 5;     //tylko po to zeby warunek wekszej od zera byl spelniony
     digitalWrite(7, false);
-    piecMinut = 15;
+    minutyOKtorychWylaczySieWentylator = 15;
+    kontrolkaWlaczonegoWentylatora = true;
   }
-  if (godziny == 13 && minuty == 10) // no i znowu przewietrzanie
+  if (godziny == 13 && minuty == 10)      // no i znowu przewietrzanie
   {
-    wylaczWentylator = false;
+    sumaCzasuWlaczeniaWentylatora = 5;   //tylko po to zeby warunek wekszej od zera byl spelniony
     digitalWrite(7, false);
-    piecMinut = 15;
+    minutyOKtorychWylaczySieWentylator = 15;
+    kontrolkaWlaczonegoWentylatora = true;
   }
 
 }
