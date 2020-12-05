@@ -77,9 +77,10 @@ void loop() {
     }
     minutyOKtorychWylaczySieWentylator = minuty + sumaCzasuWlaczeniaWentylatora; // ustawienie koncowej minuty
     if (minutyOKtorychWylaczySieWentylator > 59)
+    {
       minutyOKtorychWylaczySieWentylator = minutyOKtorychWylaczySieWentylator - 60;
-    godzinaWentylator = godziny + 1;
-
+      godzinaWentylator++;
+    }
     delay(250);   // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
   }
 
@@ -100,7 +101,7 @@ void wyswietl() {
   lcd.setCursor(0, 0);
   if (kontrolkaWlaczonegoWentylatora == true)
   {
-    lcd.print("DO ");
+    lcd.print("Do");
     lcd.print(godzinaWentylator);
     lcd.print(":");
     lcd.print(minutyOKtorychWylaczySieWentylator);
@@ -140,7 +141,7 @@ void wyswietl() {
   if (odliczanie <= 0 && opoznienie <= 0)
   {
     lcd.setCursor(0, 1);
-    lcd.print("Brak napiecia        ");
+    lcd.print("Nie ma zasilania ladowarek        ");
     digitalWrite(8, false); //wylacza napiecie
 
   }
