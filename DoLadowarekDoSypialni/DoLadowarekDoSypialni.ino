@@ -12,7 +12,7 @@ int sekundy = 20;  // ta zmienna bedzie przechowywac sekundy
 int odliczanie = 0;                                  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
 int opoznienie = 0;                                  // ilosc minut pozostala do rozpoczecia ladowania
 int minutyOKtorychWylaczySieWentylator = 0;          // to znaczy ze jak bedzie ustawione 10:07 na 3min to ta zmienna bedzie miala wartosc 10
-int limitCzasuWlaczeniaWent = 20;                    // maksymalny czas wlaczenia wentylatora
+int limitCzasuWlaczeniaWent = 30;                    // maksymalny czas wlaczenia wentylatora
 int sumaCzasuWlaczeniaWentylatora = 0;               // sumujemy interwaly wlaczenia wentylatora (max patrz limitCzasuWlaczeniaWentylatora)
 int interwaCzasulWlaczeniaWentylatora = 3;           // interwal dodawania czasu dzialania wentylatora w minutach
 int minutyPoprzednie = 0;                            // taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
@@ -96,7 +96,9 @@ void wyswietl() {
     lcd.print("Do");
     lcd.print(godzinaWentylator);
     lcd.print(":");
-    lcd.print(minutyOKtorychWylaczySieWentylator);
+    if (minutyOKtorychWylaczySieWentylator < 10)          //jak minutyOKtorychWylaczySieWentylator od 0 do 9 to trzeba zero dopisac
+    lcd.print(0);
+      lcd.print(minutyOKtorychWylaczySieWentylator);
     lcd.print(" ");
   }
   if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
@@ -116,9 +118,14 @@ void wyswietl() {
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
-    lcd.print(" min   ZA ");
+    if(opuznienie>0)
+    {
+    lcd.print(" minut ZA ");
     lcd.print(opoznienie);
     lcd.print("    ");
+    }
+    else
+    lcd.print(" minut ładowania   "); 
 
     if (minutyPoprzednie != minuty)                       // jesli minuty rozne od poprzednich nie wazne w ktora strone
     {
