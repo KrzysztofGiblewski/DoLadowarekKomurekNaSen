@@ -12,12 +12,13 @@ int sekundy = 20;  // ta zmienna bedzie przechowywac sekundy
 int odliczanie = 0;                                  // odlicza czas do konca ladowania, zaczyna odliczac po osiagnieciu przez opoznienie wartosci 0
 int opoznienie = 0;                                  // ilosc minut pozostala do rozpoczecia ladowania
 int minutyOKtorychWylaczySieWentylator = 0;          // to znaczy ze jak bedzie ustawione 10:07 na 3min to ta zmienna bedzie miala wartosc 10
-int limitCzasuWlaczeniaWent = 30;                    // maksymalny czas wlaczenia wentylatora
+int limitCzasuWlaczeniaWent = 25;                    // maksymalny czas wlaczenia wentylatora
 int sumaCzasuWlaczeniaWentylatora = 0;               // sumujemy interwaly wlaczenia wentylatora (max patrz limitCzasuWlaczeniaWentylatora)
 int interwaCzasulWlaczeniaWentylatora = 3;           // interwal dodawania czasu dzialania wentylatora w minutach
 int minutyPoprzednie = 0;                            // taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
 int godzinaWentylator;                               // tylko po to zeby muc wyswietlic godzinke po przekroczeniu kolejnej godziny
-int interwal = 25;                                   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
+int interwal = 30;                                   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
+int ekranyKolejne=0;
 boolean kontrolkaWlaczonegoWentylatora = false;      // kontrolka wlaczonego (true) lub wylaczonego (false) stanu wentylatora
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
@@ -57,9 +58,9 @@ void loop() {
   if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
     odliczanie += interwal;
-    if (odliczanie > 125)
+    if (odliczanie > 181)
       odliczanie = 0;
-    delay(250);
+    delay(350);
   }
   if (digitalRead(A1) == LOW)  //przycisk uruchamia wentylator na interwaCzasulWlaczeniaWentylatora minut
   {
@@ -76,7 +77,7 @@ void loop() {
       minutyOKtorychWylaczySieWentylator = minutyOKtorychWylaczySieWentylator - 60;
       godzinaWentylator++;
     }
-    delay(250);                            // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
+    delay(350);                            // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
   }
 
   if (digitalRead(A2) == LOW  )            // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
@@ -85,7 +86,7 @@ void loop() {
     round(opoznienie);
     if (opoznienie > 300)
       opoznienie = 0;
-    delay(250);
+    delay(350);
   }
 }
 
@@ -93,15 +94,16 @@ void wyswietl() {
   lcd.setCursor(0, 0);
   if (kontrolkaWlaczonegoWentylatora == true)
   {
-    lcd.print("Do");
+    
+    lcd.print("W ");
     lcd.print(godzinaWentylator);
     lcd.print(":");
     if (minutyOKtorychWylaczySieWentylator < 10)          //jak minutyOKtorychWylaczySieWentylator od 0 do 9 to trzeba zero dopisac
-    lcd.print(0);
-      lcd.print(minutyOKtorychWylaczySieWentylator);
+      lcd.print(0);
+    lcd.print(minutyOKtorychWylaczySieWentylator);
     lcd.print(" ");
   }
-  if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
+if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
   lcd.print(":");
@@ -113,19 +115,20 @@ void wyswietl() {
     lcd.print(0);
   lcd.print(sekundy);
   lcd.print("          ");
-
+  
   if (odliczanie != 0 || opoznienie != 0)                 // jak juz dojdzie do konca odliczania
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
-    if(opuznienie>0)
+    
+    if (opoznienie > 0)
     {
-    lcd.print(" minut ZA ");
-    lcd.print(opoznienie);
-    lcd.print("    ");
+      lcd.print(" minut ZA ");
+      lcd.print(opoznienie);
+      lcd.print("    ");
     }
     else
-    lcd.print(" minut ładowania   "); 
+      lcd.print(" minut ladowania   ");
 
     if (minutyPoprzednie != minuty)                       // jesli minuty rozne od poprzednich nie wazne w ktora strone
     {
