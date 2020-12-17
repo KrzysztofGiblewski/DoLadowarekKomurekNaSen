@@ -18,8 +18,9 @@ int interwaCzasulWlaczeniaWentylatora = 3;           // interwal dodawania czasu
 int minutyPoprzednie = 0;                            // taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
 int godzinaWentylator;                               // tylko po to zeby muc wyswietlic godzinke po przekroczeniu kolejnej godziny
 int interwal = 30;                                   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
-int ekranyKolejne=0;
+int ekranyKolejne = 0;
 boolean kontrolkaWlaczonegoWentylatora = false;      // kontrolka wlaczonego (true) lub wylaczonego (false) stanu wentylatora
+boolean kontrolkaWlaczonegoLadowania = false;        // kontrolka wlaczonego ladowania
 
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Ustawienie adresu ukladu na 0x27         A4 SDA        A5 SCL
 
@@ -54,6 +55,7 @@ void loop() {
 
   sprawdz();
   wyswietl();
+  poranneLadowanie();                                       // specjalnie poranne ladowanie wywalilem do osobnej procedury
 
   if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
@@ -90,37 +92,41 @@ void loop() {
   }
 }
 
-void wyswietl() {
+void wyswietl()
+{
   lcd.setCursor(0, 0);
-  if (kontrolkaWlaczonegoWentylatora == true)
+  if (kontrolkaWlaczonegoWentylatora == true)             // tu sprawdzam ktora wersje wyswietlic
   {
-    
     lcd.print("W ");
     lcd.print(godzinaWentylator);
     lcd.print(":");
-    if (minutyOKtorychWylaczySieWentylator < 10)          //jak minutyOKtorychWylaczySieWentylator od 0 do 9 to trzeba zero dopisac
+    if (minutyOKtorychWylaczySieWentylator < 10)          // jak minutyOKtorychWylaczySieWentylator od 0 do 9 to trzeba zero dopisac
       lcd.print(0);
     lcd.print(minutyOKtorychWylaczySieWentylator);
     lcd.print(" ");
   }
-if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
+
+  // tu wyswietlam bierzaca godzine
+
+  if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
   lcd.print(godziny);
   lcd.print(":");
-  if (minuty < 10)                                        //jak minuty od 0 do 9 to trzeba zero dopisac
+  if (minuty < 10)                                        // jak minuty od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(minuty);
   lcd.print(":");
-  if (sekundy < 10)                                       //jak sekundy od 0 do 9 to trzeba zero dopisac
+  if (sekundy < 10)                                       // jak sekundy od 0 do 9 to trzeba zero dopisac
     lcd.print(0);
   lcd.print(sekundy);
-  lcd.print("          ");
-  
+  lcd.print("          ");                                // koniec bierzacej godziny
+
+
   if (odliczanie != 0 || opoznienie != 0)                 // jak juz dojdzie do konca odliczania
   {
     lcd.setCursor(0, 1);
     lcd.print(odliczanie);
-    
+
     if (opoznienie > 0)
     {
       lcd.print(" minut ZA ");
@@ -145,14 +151,23 @@ if (godziny < 10)                                       // jak godziny od 0 do 9
     lcd.setCursor(0, 1);
     lcd.print("Nie ma zasilania ladowarek         ");
     digitalWrite(8, false);                                 // wylacza napiecie
+    kontrolkaWlaczonegoLadowania = false;
   }
+
 }
+
 
 void sprawdz() {
   if (opoznienie > 0  && odliczanie > 0)                                           // a opoznienie nadal odlicza
+  {
     digitalWrite(8, false);                                                        // przekaznik nie podaje napiecia
+    kontrolkaWlaczonegoLadowania = false;                                           // i wylaczona kontrolka
+  }
   if (opoznienie <= 0 && odliczanie > 0)                                           // jak opuznienie doszlo do zera i czas ladowania jest nadal wiekszy od zera
+  {
     digitalWrite(8, true);                                                         // to przekaznik podaje napiecie
+    kontrolkaWlaczonegoLadowania = true;                                           // kontrolka wlaczonego wentylatora ze dziala :) true
+  }
 
   if (sumaCzasuWlaczeniaWentylatora > 0 && kontrolkaWlaczonegoWentylatora == true)  // jesli kontrolka wylaczenia wentylatora wylaczona
   {
@@ -180,4 +195,16 @@ void sprawdz() {
     kontrolkaWlaczonegoWentylatora = true;      // kontrolka wlaczonego wentylatora
   }
 
+}
+
+void poranneLadowanie()
+{
+  if (kontrolkaWlaczonegoLadowania == false)   // zeby nie kolidowalo z nastawionym recznie ladowaniem jesli sie pokrywa ale nie zmieniam jej stanu jak ladowanie w trakcie to odpuszczamy
+  {
+    if (godziny == 3 && minuty == 45)          // i tak na sztywno włączanie ładowarek nad ranem
+      digitalWrite(8, true);                   // przekaznik ładowarki włączony
+      
+    if (godziny == 4 && minuty == 55)         // no i trzeba też je wyłączyć
+      digitalWrite(8, false);                  // przekaznik ładowarki wyłączony
+ }
 }
