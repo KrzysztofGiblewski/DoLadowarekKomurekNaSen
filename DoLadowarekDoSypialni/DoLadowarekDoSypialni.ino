@@ -14,10 +14,10 @@ int opoznienie = 0;                                  // ilosc minut pozostala do
 int minutyOKtorychWylaczySieWentylator = 0;          // to znaczy ze jak bedzie ustawione 10:07 na 3min to ta zmienna bedzie miala wartosc 10
 int limitCzasuWlaczeniaWent = 25;                    // maksymalny czas wlaczenia wentylatora
 int sumaCzasuWlaczeniaWentylatora = 0;               // sumujemy interwaly wlaczenia wentylatora (max patrz limitCzasuWlaczeniaWentylatora)
-int interwaCzasulWlaczeniaWentylatora = 3;           // interwal dodawania czasu dzialania wentylatora w minutach
+int interwaCzasulWlaczeniaWentylatora = 5;           // interwal dodawania czasu dzialania wentylatora w minutach
 int minutyPoprzednie = 0;                            // taka wartosc tymczasowa zeby mozna bylo zobaczyc czy bierzaca minuta nie jest rowna poprzedniej minucie
 int godzinaWentylator;                               // tylko po to zeby muc wyswietlic godzinke po przekroczeniu kolejnej godziny
-int interwal = 30;                                   // to ilosc minut dodawana przez klikniecie przycisku, przy odejmowaniu odejmuje polowe tej wartosci
+int interwal = 45;                                   // to ilosc minut dodawana przez klikniecie przycisku
 int ekranyKolejne = 0;
 boolean kontrolkaWlaczonegoWentylatora = false;      // kontrolka wlaczonego (true) lub wylaczonego (false) stanu wentylatora
 boolean kontrolkaWlaczonegoLadowania = false;        // kontrolka wlaczonego ladowania
@@ -56,22 +56,22 @@ void loop() {
   sprawdz();
   wyswietl();
   poranneLadowanie();                                       // specjalnie poranne ladowanie wywalilem do osobnej procedury
-
+ 
   if (digitalRead(A0) == LOW)    //przycisk wyboru A0 bedzie dodawal dlugosc ladowania o interwal
   {
     odliczanie += interwal;
     if (odliczanie > 181)
       odliczanie = 0;
-    delay(350);
+    delay(500);
   }
-  if (digitalRead(A1) == LOW)  //przycisk uruchamia wentylator na interwaCzasulWlaczeniaWentylatora minut
+  if (digitalRead(A1) == LOW)                                                    //przycisk uruchamia wentylator na interwaCzasulWlaczeniaWentylatora minut
   {
-    sumaCzasuWlaczeniaWentylatora += interwaCzasulWlaczeniaWentylatora; //to dodaj do minut wylaczenia czas
+    sumaCzasuWlaczeniaWentylatora += interwaCzasulWlaczeniaWentylatora;          //to dodaj do minut wylaczenia czas
     kontrolkaWlaczonegoWentylatora = true;
     godzinaWentylator = godziny;
-    if (limitCzasuWlaczeniaWent < sumaCzasuWlaczeniaWentylatora  )// a jak przekroczy limit czasu dlugosci dzialania
+    if (limitCzasuWlaczeniaWent < sumaCzasuWlaczeniaWentylatora  )               // a jak przekroczy limit czasu dlugosci dzialania
     {
-      sumaCzasuWlaczeniaWentylatora = 0;  // to wyzerowanie przez nastawienie minut wylaczenia na biezace minuty
+      sumaCzasuWlaczeniaWentylatora = 0;                                         // to wyzerowanie przez nastawienie minut wylaczenia na biezace minuty
     }
     minutyOKtorychWylaczySieWentylator = minuty + sumaCzasuWlaczeniaWentylatora; // ustawienie koncowej minuty
     if (minutyOKtorychWylaczySieWentylator > 59)
@@ -79,16 +79,16 @@ void loop() {
       minutyOKtorychWylaczySieWentylator = minutyOKtorychWylaczySieWentylator - 60;
       godzinaWentylator++;
     }
-    delay(350);                            // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
+    delay(500);                                                                   // pauza zeby klikniecia nie byly zbyt szybkie bo wtedy ciezko cos ustawic
   }
 
-  if (digitalRead(A2) == LOW  )            // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
+  if (digitalRead(A2) == LOW  )                                                   // przycisk A2 dodaje opuznienie a po przekroczeniu 300 minut = sie 0 i tak w kolko
   {
     opoznienie += 60;
     round(opoznienie);
     if (opoznienie > 300)
       opoznienie = 0;
-    delay(350);
+    delay(400);
   }
 }
 
@@ -106,7 +106,7 @@ void wyswietl()
     lcd.print(" ");
   }
 
-  // tu wyswietlam bierzaca godzine
+  //////////////    tu wyswietlam bierzaca godzine   ////////////////////////
 
   if (godziny < 10)                                       // jak godziny od 0 do 9 to trzeba zero dopisac zeby ładnie było
     lcd.print(0);
@@ -158,7 +158,9 @@ void wyswietl()
 
 
 void sprawdz() {
-  if (opoznienie > 0  && odliczanie > 0)                                           // a opoznienie nadal odlicza
+
+  /////////   Ładowanie   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (opoznienie > 0  && odliczanie > 0)                                           // a opoznienie wieksze od zera i nadal odliczanie do końca czasu ladowania
   {
     digitalWrite(8, false);                                                        // przekaznik nie podaje napiecia
     kontrolkaWlaczonegoLadowania = false;                                           // i wylaczona kontrolka
@@ -166,8 +168,10 @@ void sprawdz() {
   if (opoznienie <= 0 && odliczanie > 0)                                           // jak opuznienie doszlo do zera i czas ladowania jest nadal wiekszy od zera
   {
     digitalWrite(8, true);                                                         // to przekaznik podaje napiecie
-    kontrolkaWlaczonegoLadowania = true;                                           // kontrolka wlaczonego wentylatora ze dziala :) true
+    kontrolkaWlaczonegoLadowania = true;                                           // kontrolka wlaczonego
   }
+
+  ////////   Wentylator    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   if (sumaCzasuWlaczeniaWentylatora > 0 && kontrolkaWlaczonegoWentylatora == true)  // jesli kontrolka wylaczenia wentylatora wylaczona
   {
@@ -201,10 +205,12 @@ void poranneLadowanie()
 {
   if (kontrolkaWlaczonegoLadowania == false)   // zeby nie kolidowalo z nastawionym recznie ladowaniem jesli sie pokrywa ale nie zmieniam jej stanu jak ladowanie w trakcie to odpuszczamy
   {
-    if (godziny == 3 && minuty == 45)          // i tak na sztywno włączanie ładowarek nad ranem
+    if (godziny == 4 && minuty == 55)          // i tak na sztywno włączanie ładowarek nad ranem
+    {
+      odliczanie = 60;                         // ustawiam dlugosc odliczania
+      opoznienie = 0;                          // tak na wszelki wypadek zeby nie bruzdzilo
       digitalWrite(8, true);                   // przekaznik ładowarki włączony
-      
-    if (godziny == 4 && minuty == 55)         // no i trzeba też je wyłączyć
-      digitalWrite(8, false);                  // przekaznik ładowarki wyłączony
- }
+      kontrolkaWlaczonegoLadowania = true;     // ustawiam kontrolke na wlaczona
+    }
+  }
 }
