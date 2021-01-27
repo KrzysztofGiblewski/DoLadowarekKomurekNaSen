@@ -184,28 +184,38 @@ void sprawdz() {
     kontrolkaWlaczonegoWentylatora = false;                                                     // kontrolka zmiana stanu na wylaczony
   }
 
-  if (godziny == 10 && minuty == 10)            // tak na sztywno zapisany czas wlaczenia wentylatora zeby sie przewietrzylo
+  if (godziny == 19 && minuty == 10)            // tak na sztywno zapisany czas wlaczenia wentylatora zeby sie przewietrzylo
   {
-    sumaCzasuWlaczeniaWentylatora = 5;          // tylko po to zeby warunek wekszej od zera byl spelniony
-    digitalWrite(7, false);                     // przekaznik wlaczony wentylator dziala
-    minutyOKtorychWylaczySieWentylator = 15;    // tak na sztywno minuty wylaczenia wentylatora
-    kontrolkaWlaczonegoWentylatora = true;      // kontrolka wlaczonego wentylatora
+    przewietrzanie();
+  }
+  if (godziny == 10 && minuty == 10)            // no i znowu przewietrzanie
+  {
+    przewietrzanie();
+  }
+  if (godziny == 11 && minuty == 10)            // no i znowu przewietrzanie
+  {
+    przewietrzanie();
   }
   if (godziny == 13 && minuty == 10)            // no i znowu przewietrzanie
   {
+    przewietrzanie();
+  }
+
+}
+void przewietrzanie()
+{
     sumaCzasuWlaczeniaWentylatora = 5;          // tylko po to zeby warunek wekszej od zera byl spelniony
     digitalWrite(7, false);                     // przekaznik wlaczony wentylator dziala
     minutyOKtorychWylaczySieWentylator = 15;    // tak na sztywno minuty wylaczenia wentylatora
     kontrolkaWlaczonegoWentylatora = true;      // kontrolka wlaczonego wentylatora
-  }
-
+  
 }
 
 void poranneLadowanie()
 {
   if (kontrolkaWlaczonegoLadowania == false)   // zeby nie kolidowalo z nastawionym recznie ladowaniem jesli sie pokrywa ale nie zmieniam jej stanu jak ladowanie w trakcie to odpuszczamy
   {
-    if (godziny == 4 && minuty == 55)          // i tak na sztywno włączanie ładowarek nad ranem
+    if (godziny == 3 && minuty == 55)          // i tak na sztywno włączanie ładowarek nad ranem
     {
       odliczanie = 60;                         // ustawiam dlugosc odliczania
       opoznienie = 0;                          // tak na wszelki wypadek zeby nie bruzdzilo
